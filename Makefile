@@ -87,6 +87,16 @@ test-e2e-single-az:
 	GINKGO_SKIP="\"sc1\"|\"st1\"" \
 	./hack/e2e/run.sh
 
+.PHONY: test-e2e-single-az-arm
+test-e2e-single-az-arm:
+	AWS_REGION=us-west-2 \
+	AWS_AVAILABILITY_ZONES=us-west-2a \
+	INSTANCE_TYPE=a1.large \
+	TEST_PATH=./tests/e2e/... \
+	GINKGO_FOCUS="\[ebs-csi-e2e\] \[single-az\]" \
+	GINKGO_SKIP="\"sc1\"|\"st1\"" \
+	./hack/e2e/run.sh
+
 .PHONY: test-e2e-multi-az
 test-e2e-multi-az:
 	AWS_REGION=us-west-2 \
@@ -96,11 +106,30 @@ test-e2e-multi-az:
 	GINKGO_FOCUS="\[ebs-csi-e2e\] \[multi-az\]" \
 	./hack/e2e/run.sh
 
+.PHONY: test-e2e-multi-az-arm
+test-e2e-multi-az-arm:
+	AWS_REGION=us-west-2 \
+	AWS_AVAILABILITY_ZONES=us-west-2a,us-west-2b,us-west-2c \
+	INSTANCE_TYPE=a1.large \
+	TEST_PATH=./tests/e2e/... \
+	GINKGO_FOCUS="\[ebs-csi-e2e\] \[multi-az\]" \
+	./hack/e2e/run.sh
+
 .PHONY: test-e2e-migration
 test-e2e-migration:
 	AWS_REGION=us-west-2 \
 	AWS_AVAILABILITY_ZONES=us-west-2a,us-west-2b,us-west-2c \
 	HELM_EXTRA_FLAGS='--set=controller.k8sTagClusterId=$$CLUSTER_NAME' \
+	TEST_PATH=./tests/e2e-kubernetes/... \
+	GINKGO_FOCUS="\[ebs-csi-migration\]" \
+	EBS_CHECK_MIGRATION=true \
+	./hack/e2e/run.sh
+
+.PHONY: test-e2e-migration-arm
+test-e2e-migration-arm:
+	AWS_REGION=us-west-2 \
+	AWS_AVAILABILITY_ZONES=us-west-2a \
+	INSTANCE_TYPE=a1.large \
 	TEST_PATH=./tests/e2e-kubernetes/... \
 	GINKGO_FOCUS="\[ebs-csi-migration\]" \
 	EBS_CHECK_MIGRATION=true \
@@ -125,6 +154,16 @@ test-e2e-external-eks:
 	EKSCTL_ADMIN_ROLE="Infra-prod-KopsDeleteAllLambdaServiceRoleF1578477-1ELDFIB4KCMXV" \
 	AWS_REGION=us-west-2 \
 	AWS_AVAILABILITY_ZONES=us-west-2a,us-west-2b \
+	TEST_PATH=./tests/e2e-kubernetes/... \
+	GINKGO_FOCUS="External.Storage" \
+	GINKGO_SKIP="\[Disruptive\]|\[Serial\]" \
+	./hack/e2e/run.sh
+
+.PHONY: test-e2e-external-arm
+test-e2e-external-arm:
+	AWS_REGION=us-west-2 \
+	AWS_AVAILABILITY_ZONES=us-west-2a \
+	INSTANCE_TYPE=a1.large \
 	TEST_PATH=./tests/e2e-kubernetes/... \
 	GINKGO_FOCUS="External.Storage" \
 	GINKGO_SKIP="\[Disruptive\]|\[Serial\]" \
